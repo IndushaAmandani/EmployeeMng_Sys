@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<script>
+
+    window.addEventListener("load",init);
+
+    function init(){
+        loadEmployeeView();
+        loadEmployeeForm();
+        showGender();
+    }
+     
+    function loadEmployeeView(){
+            var xhttp = new XMLHttpRequest();-);
+            xhttp.send();
+            }
+
+                 
+    function loadEmployeeForm(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+
+                showGender(this.responseText);
+               //  console.log(this.responseText);
+                    
+                }
+
+            }   
+
+            xhttp.open("GET","../Server/gender_view.php",true);
+            xhttp.send();
+            }
+
+            function showGender($json){
+
+                    var genders = JSON.parse($json);
+                    cmbGender.innerHTML = "";
+
+                    for(let i=0; i < genders.length; i++){
+                        const gender = genders[i];
+
+                        var option = document.createElement("option");
+                        option.innerHTML = gender['Name'];
+                        option.value = gender['id'];
+                        cmbGender.appendChild(option);
+                    }
+            }
+
+
+            function showEmployee($json){
+             
+                 var employees = JSON.parse($json);
+                 tdisplay.innerHTML = "";
+                     for (let i = 0; i < employees.length; i++) {
+                    const employee = employees [i];
+
+                    var tr = document.createElement("tr"); 
+
+                    var  tdID = document.createElement("td");
+                    tdID.innerHTML = employee['id'];
+                    tr.appendChild(tdID);
+
+                    var  tdName = document.createElement("td");
+                    tdName.innerHTML = employee['name'];
+                    tr.appendChild(tdName);
+
+                    var  tdAge = document.createElement("td");
+                    tdAge.innerHTML = employee['age'];
+                    tr.appendChild(tdAge);
+
+
+                    var  tdGender = document.createElement("td");
+                    tdGender.innerHTML = employee['gender'];
+                    tr.appendChild(tdGender);
+
+                    var  tdDelete = document.createElement("td");
+                    var btnDelete = document.createElement("input");
+
+                    btnDelete.type = "button";
+                    btnDelete.value = "Delete";
+                    btnDelete.addEventListener("click",function(){
+                       deleteEmployee(employee);
+                    });
+                    tdDelete.appendChild(btnDelete );
+                    tr.appendChild(tdDelete);
+
+                    tdisplay.appendChild(tr);
+                }          
+            }
+
+                  function deleteEmployee(employee){
+                   var confirm = window.confirm("Are you sure to delete this " + employee['name']);
+                   if(confirm){
+                        var xhttp = new XMLHttpRequest();
+                        xhttp.onreadystatechange = function(){
+                            if(this.readyState == 4 && this.status == 200){
+                                loadEmployeeView();
+                            }
+                        }
+                        xhttp.open("GET","../Server/employe_delete.php?id="+employee['id'],true);
+                        xhttp.send();
+                   }
+            }
+
+            function addEmployee(){
+
+                var name = txtname.value;   
+                var age = txtage.value;
+                var gender = cmbGender.value;
+
+                 var confirm = window.confirm("Are  you sure to add this: \n\n " 
+                                                                         +"Name : " +name+ "\n"
+                                                                         +"Age : " +age+ "\n"
+                                                                         +"Gender : " +gender+ "\n"
+                                                      );
+                    if(confirm){
+                         var xhttp = new XMLHttpRequest();
+                         xhttp.onreadystatechange = function(){
+                             if(this.readyState == 4 && this.status == 200){
+                                 loadEmployeeView();
+                             }
+                         }
+                         xhttp.open("POST","../Server/employee_add.php",true);
+
+                         xhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+                         xhttp.send("name="+name+"&age="+age+"&gender="+gender);
+                    }
+            }
+           
+  </script>
+
+  <title>Document</title>
+</head>
+<body>
+    <h1>Employee From</h1>
+    <form>
+        <label> Name :</label>
+        <input  id="txtname" />
+        <br><br>
+        <label> Age :</label>
+        <input  id="txtage" />
+        <br><br>
+        <label> Gender :</label>
+        <select id = "cmbGender">
+
+        </select>
+        <br><br>
+        <input type="reset" value="Clear">
+        <input  onclick = "addEmployee()" type="button" value="Submit ">
+
+    </form>
+    <p>--------------------------------------------------------------------------------------------------------</p>
+    <h1>Employee View</h1>
+  <table border = "1" cellspacing = "0" cellpadding = "5">
+      <thead>
+          <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Gender</th>
+              <th></th>
+
+          </tr>
+
+      </thead>
+      <tbody id = "tdisplay">
+    </tbody>
+<!-- deleteEmployee  id-> -->
+</table>
+</body>
+</html>
